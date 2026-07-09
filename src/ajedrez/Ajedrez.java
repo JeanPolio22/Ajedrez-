@@ -13,6 +13,9 @@ public class Ajedrez {
     /**
      * @param args the command line arguments
      */
+    
+    
+    // sout 
     public static void main(String[] args) {
         // TODO code application logic here
     }
