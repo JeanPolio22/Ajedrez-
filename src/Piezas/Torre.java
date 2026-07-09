@@ -1,13 +1,15 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package Piezas;
+package piezas;
+public class Torre extends Pieza {
 
-/**
- *
- * @author mende
- */
-public class Torre {
-    
+    public Torre(boolean blanca) {
+        super(blanca, blanca ? "♖" : "♜");
+    }
+
+    @Override
+    public boolean movimientoValido(int fo, int co, int fd, int cd) {
+
+        return fo == fd || co == cd;
+
+    }
+
 }
