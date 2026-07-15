@@ -9,5 +9,7 @@ package Piezas;
  * @author mende
  */
 public class Alfil {
-    
+    public static void main(String[] args) {
+        System.out.println("hola");
+    }
 }
