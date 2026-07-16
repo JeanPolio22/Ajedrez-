@@ -1,6 +1,6 @@
 package Piezas;
 
-public class Pieza {
+public abstract class Pieza {
 
     //Determina si la pieza es blanca o negra.
     private boolean blanca;
@@ -20,7 +20,6 @@ public class Pieza {
         this.fila = fila;
         this.columna = columna;
 
-        //Todas las piezas comienzan activas.
         capturada = false;
 
     }
@@ -42,7 +41,7 @@ public class Pieza {
     }
 
 
-    //Devuelve la fila actual.
+    //Obtiene la fila.
     public int getFila() {
 
         return fila;
@@ -58,7 +57,7 @@ public class Pieza {
     }
 
 
-    //Devuelve la columna actual.
+    //Obtiene la columna.
     public int getColumna() {
 
         return columna;
@@ -74,7 +73,7 @@ public class Pieza {
     }
 
 
-    //Devuelve si la pieza fue capturada.
+    //Comprueba si la pieza fue capturada.
     public boolean estaCapturada() {
 
         return capturada;
@@ -82,7 +81,7 @@ public class Pieza {
     }
 
 
-    //Modifica el estado de la captura.
+    //Modifica el estado de captura.
     public void setCapturada(boolean capturada) {
 
         this.capturada = capturada;
@@ -90,13 +89,17 @@ public class Pieza {
     }
 
 
-    //Permite mover la pieza.
-    public void mover(int fila, int columna) {
+    //Mueve la pieza.
+    public void mover(int fila,int columna){
 
         this.fila = fila;
-
         this.columna = columna;
 
     }
+
+
+    //Todas las piezas deberán implementar su símbolo.
+    public abstract String getSimbolo();
+
 
 }

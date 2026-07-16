@@ -1,13 +1,29 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Piezas;
 
-/**
- *
- * @author mende
- */
-public class Peon {
-    
+public class Peon extends Pieza{
+
+
+    //Constructor.
+    public Peon(boolean blanca,int fila,int columna){
+
+        super(blanca,fila,columna);
+
+    }
+
+
+    //Devuelve el símbolo del peón.
+    @Override
+    public String getSimbolo(){
+
+        if(esBlanca()){
+
+            return "♙";
+
+        }
+
+        return "♟";
+
+    }
+
+
 }
