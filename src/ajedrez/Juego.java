@@ -1,25 +1,18 @@
 package ajedrez;
 
+import Piezas.Peon;
 import Piezas.Pieza;
+import Piezas.Torre;
 import Tablero.Tablero;
 
 public class Juego {
 
-    // Tablero lógico del juego.
     private Tablero tablero;
 
-    // Indica si es el turno de las blancas.
     private boolean turnoBlancas;
 
-    // Pieza seleccionada por el jugador.
     private Pieza piezaSeleccionada;
 
-    // Posición seleccionada.
-    private int filaSeleccionada;
-    private int columnaSeleccionada;
-
-
-    // Constructor.
     public Juego() {
 
         tablero = new Tablero();
@@ -28,89 +21,87 @@ public class Juego {
 
         piezaSeleccionada = null;
 
-        filaSeleccionada = -1;
-        columnaSeleccionada = -1;
+        colocarPiezas();
 
     }
 
+    private void colocarPiezas() {
 
-    // Devuelve el tablero.
-    public Tablero getTablero() {
+        // Torres negras
+        tablero.colocarPieza(new Torre(false,0,0),0,0);
+        tablero.colocarPieza(new Torre(false,0,7),0,7);
+
+        // Torres blancas
+        tablero.colocarPieza(new Torre(true,7,0),7,0);
+        tablero.colocarPieza(new Torre(true,7,7),7,7);
+
+        // Peones negros
+        for(int c=0;c<8;c++){
+
+            tablero.colocarPieza(new Peon(false,1,c),1,c);
+
+        }
+
+        // Peones blancos
+        for(int c=0;c<8;c++){
+
+            tablero.colocarPieza(new Peon(true,6,c),6,c);
+
+        }
+
+    }
+
+    public Tablero getTablero(){
 
         return tablero;
 
     }
 
+    public boolean seleccionarCasilla(int fila,int columna){
 
-    // Devuelve el turno actual.
-    public boolean esTurnoBlancas() {
+        Pieza pieza = tablero.getPieza(fila,columna);
 
-        return turnoBlancas;
+        // No hay pieza seleccionada todavía.
+        if(piezaSeleccionada == null){
 
-    }
+            if(pieza == null){
 
+                return false;
 
-    // Cambia el turno.
-    public void cambiarTurno() {
+            }
 
-        turnoBlancas = !turnoBlancas;
+            // Solo puede seleccionar piezas de su turno.
+            if(pieza.esBlanca() != turnoBlancas){
 
-    }
+                return false;
 
+            }
 
-    // Devuelve la pieza seleccionada.
-    public Pieza getPiezaSeleccionada() {
+            piezaSeleccionada = pieza;
 
-        return piezaSeleccionada;
+            return false;
 
-    }
+        }
 
+        // Intentar mover.
+        if(piezaSeleccionada.movimientoValido(fila,columna,tablero)){
 
-    // Guarda la pieza seleccionada.
-    public void setPiezaSeleccionada(Pieza pieza) {
+            tablero.moverPieza(
 
-        piezaSeleccionada = pieza;
+                    piezaSeleccionada.getFila(),
+                    piezaSeleccionada.getColumna(),
+                    fila,
+                    columna
 
-    }
+            );
 
+            turnoBlancas = !turnoBlancas;
 
-    // Guarda la casilla seleccionada.
-    public void seleccionarCasilla(int fila, int columna) {
-
-        filaSeleccionada = fila;
-        columnaSeleccionada = columna;
-
-        System.out.println("----------------------------");
-        System.out.println("Fila seleccionada : " + fila);
-        System.out.println("Columna seleccionada : " + columna);
-        System.out.println("----------------------------");
-
-    }
-
-
-    // Obtiene la fila seleccionada.
-    public int getFilaSeleccionada() {
-
-        return filaSeleccionada;
-
-    }
-
-
-    // Obtiene la columna seleccionada.
-    public int getColumnaSeleccionada() {
-
-        return columnaSeleccionada;
-
-    }
-
-
-    // Reinicia la selección.
-    public void limpiarSeleccion() {
+        }
 
         piezaSeleccionada = null;
 
-        filaSeleccionada = -1;
-        columnaSeleccionada = -1;
+        return true;
 
     }
 
