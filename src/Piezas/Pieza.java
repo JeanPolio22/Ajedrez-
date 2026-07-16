@@ -1,23 +1,53 @@
-package piezas;
+package Piezas;
 
-public abstract class Pieza {
+public class Pieza {
 
-    protected boolean blanca;
-    protected String simbolo;
+    //Determina si la pieza es blanca o negra.
+    private boolean blanca;
 
-    public Pieza(boolean blanca, String simbolo) {
+    //Posición de la pieza dentro del tablero.
+    private int fila;
+    private int columna;
+
+    //Constructor.
+    public Pieza(boolean blanca, int fila, int columna) {
         this.blanca = blanca;
-        this.simbolo = simbolo;
+        this.fila = fila;
+        this.columna = columna;
     }
 
+    //Indica si la pieza es blanca.
     public boolean esBlanca() {
         return blanca;
     }
 
-    public String getSimbolo() {
-        return simbolo;
+    //Permite cambiar el color de la pieza.
+    public void setBlanca(boolean blanca) {
+        this.blanca = blanca;
     }
 
-    public abstract boolean movimientoValido(int filaOrigen, int colOrigen,
-                                             int filaDestino, int colDestino);
+    //Obtiene la fila donde se encuentra la pieza.
+    public int getFila() {
+        return fila;
+    }
+
+    //Modifica la fila.
+    public void setFila(int fila) {
+        this.fila = fila;
+    }
+
+
+    //Obtiene la columna donde se encuentra la pieza.
+    public int getColumna() {
+        return columna;
+    }
+
+
+    //Modifica la columna.
+    public void setColumna(int columna) {
+
+        this.columna = columna;
+
+    }
+
 }
