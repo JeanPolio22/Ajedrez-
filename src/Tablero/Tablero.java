@@ -78,8 +78,6 @@ public boolean posicionValida(int fila, int columna) {
            columna >= 0 && columna < 8;
 
 }
-
-
 //Devuelve true si en esa casilla hay una pieza enemiga.
 public boolean hayEnemigo(int fila,
                           int columna,
