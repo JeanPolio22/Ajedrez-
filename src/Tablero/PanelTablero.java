@@ -17,7 +17,7 @@ public class PanelTablero extends JPanel {
 
     public PanelTablero() {
 
-        setLayout(new GridLayout(8,8));
+        setLayout(new GridLayout(8, 8));
 
         casillas = new JButton[8][8];
 
@@ -31,29 +31,26 @@ public class PanelTablero extends JPanel {
 
     private void crearTablero() {
 
-        Color claro = new Color(240,217,181);
-        Color oscuro = new Color(181,136,99);
+        Color claro = new Color(240, 217, 181);
+        Color oscuro = new Color(181, 136, 99);
 
-        for(int fila=0; fila<8; fila++) {
+        for (int fila = 0; fila < 8; fila++) {
 
-            for(int columna=0; columna<8; columna++) {
+            for (int columna = 0; columna < 8; columna++) {
 
                 JButton boton = new JButton();
 
                 boton.setFocusable(false);
-
+                boton.setFocusPainted(false);
                 boton.setBorder(BorderFactory.createEmptyBorder());
 
-                boton.setFocusPainted(false);
+                boton.setFont(new Font("Dialog", Font.PLAIN, 42));
 
-                boton.setFont(new Font("Dialog", Font.PLAIN, 44));
-
-                if((fila+columna)%2==0) {
+                if ((fila + columna) % 2 == 0) {
 
                     boton.setBackground(claro);
 
-                }
-                else {
+                } else {
 
                     boton.setBackground(oscuro);
 
@@ -64,7 +61,9 @@ public class PanelTablero extends JPanel {
 
                 boton.addActionListener(e -> {
 
-                    juego.seleccionarCasilla(f,c);
+                    juego.seleccionarCasilla(f, c);
+
+                    actualizarTablero();
 
                 });
 
@@ -80,27 +79,25 @@ public class PanelTablero extends JPanel {
 
     public void actualizarTablero() {
 
-        for(int fila=0; fila<8; fila++) {
+        for (int fila = 0; fila < 8; fila++) {
 
-            for(int columna=0; columna<8; columna++) {
+            for (int columna = 0; columna < 8; columna++) {
 
-                Pieza pieza = juego.getTablero().getPieza(fila,columna);
+                Pieza pieza = juego.getTablero().getPieza(fila, columna);
 
-                if(pieza == null) {
+                if (pieza == null) {
 
                     casillas[fila][columna].setText("");
 
-                }
-                else {
+                } else {
 
                     casillas[fila][columna].setText(pieza.getSimbolo());
 
-                    if(pieza.esBlanca()) {
+                    if (pieza.esBlanca()) {
 
                         casillas[fila][columna].setForeground(Color.WHITE);
 
-                    }
-                    else {
+                    } else {
 
                         casillas[fila][columna].setForeground(Color.BLACK);
 
@@ -114,7 +111,7 @@ public class PanelTablero extends JPanel {
 
     }
 
-    public JButton getCasilla(int fila,int columna) {
+    public JButton getCasilla(int fila, int columna) {
 
         return casillas[fila][columna];
 
