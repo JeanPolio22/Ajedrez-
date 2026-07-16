@@ -1,7 +1,5 @@
 package tablero;
-
-import piezas.Pieza;
-
+import Piezas.Pieza;
 public class Casilla {
 
     private Pieza pieza;

@@ -70,5 +70,28 @@ public class Tablero {
         return tablero[fila][columna] == null;
 
     }
+    
+    //Verifica si una posición pertenece al tablero.
+public boolean posicionValida(int fila, int columna) {
 
+    return fila >= 0 && fila < 8 &&
+           columna >= 0 && columna < 8;
+
+}
+
+
+//Devuelve true si en esa casilla hay una pieza enemiga.
+public boolean hayEnemigo(int fila,
+                          int columna,
+                          boolean blanca) {
+
+    if (estaVacia(fila, columna)) {
+
+        return false;
+
+    }
+
+    return tablero[fila][columna].esBlanca() != blanca;
+
+}
 }

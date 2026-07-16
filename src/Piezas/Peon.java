@@ -1,29 +1,32 @@
 package Piezas;
 
-public class Peon extends Pieza{
+import Tablero.Tablero;
 
+public class Peon extends Pieza {
 
     //Constructor.
-    public Peon(boolean blanca,int fila,int columna){
+    public Peon(boolean blanca, int fila, int columna) {
 
-        super(blanca,fila,columna);
+        super(blanca, fila, columna);
 
     }
-
 
     //Devuelve el símbolo del peón.
     @Override
-    public String getSimbolo(){
+    public String getSimbolo() {
 
-        if(esBlanca()){
-
-            return "♙";
-
-        }
-
-        return "♟";
+        return esBlanca() ? "♙" : "♟";
 
     }
 
+    @Override
+    public boolean movimientoValido(int filaDestino,
+                                    int columnaDestino,
+                                    Tablero tablero) {
+
+        // Se implementará más adelante.
+        return false;
+
+    }
 
 }
