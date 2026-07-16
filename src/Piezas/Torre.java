@@ -13,7 +13,8 @@ public class Torre extends Pieza {
     @Override
     public String getSimbolo() {
 
-        return esBlanca() ? "♖" : "♜";
+        // Usamos siempre la torre negra
+        return "♜";
 
     }
 
@@ -22,7 +23,6 @@ public class Torre extends Pieza {
                                     int columnaDestino,
                                     Tablero tablero) {
 
-        //La posición debe existir.
         if (!tablero.posicionValida(filaDestino, columnaDestino)) {
 
             return false;
@@ -32,7 +32,6 @@ public class Torre extends Pieza {
         int filaOrigen = getFila();
         int columnaOrigen = getColumna();
 
-        //No puede quedarse en la misma casilla.
         if (filaOrigen == filaDestino &&
             columnaOrigen == columnaDestino) {
 
@@ -40,7 +39,6 @@ public class Torre extends Pieza {
 
         }
 
-        //Debe moverse solo en fila o columna.
         if (filaOrigen != filaDestino &&
             columnaOrigen != columnaDestino) {
 
@@ -48,24 +46,11 @@ public class Torre extends Pieza {
 
         }
 
-        //Movimiento horizontal.
         if (filaOrigen == filaDestino) {
 
-            int paso;
+            int paso = columnaDestino > columnaOrigen ? 1 : -1;
 
-            if (columnaDestino > columnaOrigen) {
-
-                paso = 1;
-
-            } else {
-
-                paso = -1;
-
-            }
-
-            for (int c = columnaOrigen + paso;
-                 c != columnaDestino;
-                 c += paso) {
+            for (int c = columnaOrigen + paso; c != columnaDestino; c += paso) {
 
                 if (!tablero.estaVacia(filaOrigen, c)) {
 
@@ -75,26 +60,11 @@ public class Torre extends Pieza {
 
             }
 
-        }
+        } else {
 
-        //Movimiento vertical.
-        else {
+            int paso = filaDestino > filaOrigen ? 1 : -1;
 
-            int paso;
-
-            if (filaDestino > filaOrigen) {
-
-                paso = 1;
-
-            } else {
-
-                paso = -1;
-
-            }
-
-            for (int f = filaOrigen + paso;
-                 f != filaDestino;
-                 f += paso) {
+            for (int f = filaOrigen + paso; f != filaDestino; f += paso) {
 
                 if (!tablero.estaVacia(f, columnaOrigen)) {
 
@@ -106,18 +76,13 @@ public class Torre extends Pieza {
 
         }
 
-        //Destino vacío.
         if (tablero.estaVacia(filaDestino, columnaDestino)) {
 
             return true;
 
         }
 
-        //Destino ocupado por enemigo.
-        return tablero.hayEnemigo(
-                filaDestino,
-                columnaDestino,
-                esBlanca());
+        return tablero.hayEnemigo(filaDestino, columnaDestino, esBlanca());
 
     }
 
