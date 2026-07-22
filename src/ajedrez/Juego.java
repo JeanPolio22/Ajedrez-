@@ -68,15 +68,12 @@ public class Juego {
         return tablero;
     }
 
-    // Método para comprobar si el rey del color indicado está en jaque
     public boolean estaEnJaque(boolean esBlanca) {
         int[] posRey = tablero.buscarRey(esBlanca);
         if (posRey == null) return false;
-        // Si el rey es blanco, el atacante es negro (!esBlanca)
         return tablero.esCasillaAtacada(posRey[0], posRey[1], !esBlanca);
     }
 
-    // Comprueba si un bando tiene algún movimiento legal disponible para evitar el jaque mate
     public boolean tieneMovimientosLegales(boolean esBlanca) {
         for (int fOrigen = 0; fOrigen < 8; fOrigen++) {
             for (int cOrigen = 0; cOrigen < 8; cOrigen++) {
@@ -85,21 +82,20 @@ public class Juego {
                     for (int fDestino = 0; fDestino < 8; fDestino++) {
                         for (int cDestino = 0; cDestino < 8; cDestino++) {
                             if (p.movimientoValido(fDestino, cDestino, tablero)) {
-                                // Simulamos el movimiento para ver si el rey queda a salvo
                                 Pieza piezaCapturada = tablero.getPieza(fDestino, cDestino);
                                 int origenF = p.getFila();
                                 int origenC = p.getColumna();
 
                                 tablero.moverPieza(origenF, origenC, fDestino, cDestino);
                                 boolean sigueEnJaque = estaEnJaque(esBlanca);
-                                // Revertimos simulación
+                                
                                 tablero.moverPieza(fDestino, cDestino, origenF, origenC);
                                 if (piezaCapturada != null) {
                                     tablero.colocarPieza(piezaCapturada, fDestino, cDestino);
                                 }
 
                                 if (!sigueEnJaque) {
-                                    return true; // Encontró al menos un movimiento válido para salvarse
+                                    return true;
                                 }
                             }
                         }
@@ -129,7 +125,6 @@ public class Juego {
             if (panel != null) {
                 panel.restaurarColores();
                 
-                // Si hay jaque, resaltamos la casilla del rey en peligro
                 if (estaEnJaque(turnoBlancas)) {
                     int[] posRey = tablero.buscarRey(turnoBlancas);
                     if (posRey != null) {
@@ -140,7 +135,6 @@ public class Juego {
                 for (int f = 0; f < 8; f++) {
                     for (int c = 0; c < 8; c++) {
                         if (piezaSeleccionada.movimientoValido(f, c, tablero)) {
-                            // Validar que el movimiento no deje o mantenga al propio rey en jaque
                             Pieza destinoTemp = tablero.getPieza(f, c);
                             int origF = piezaSeleccionada.getFila();
                             int origC = piezaSeleccionada.getColumna();
@@ -163,9 +157,7 @@ public class Juego {
             return false;
         }
 
-        // Intento de movimiento
         if(piezaSeleccionada.movimientoValido(fila, columna, tablero)){
-            // Validar simulación de movimiento seguro
             Pieza destinoTemp = tablero.getPieza(fila, columna);
             int origF = piezaSeleccionada.getFila();
             int origC = piezaSeleccionada.getColumna();
@@ -179,10 +171,10 @@ public class Juego {
 
             if (!reyExpuesto) {
                 tablero.moverPieza(origF, origC, fila, columna);
+                
+                boolean oponenteEsBlanco = !turnoBlancas;
                 turnoBlancas = !turnoBlancas;
 
-                // Comprobar si el turno siguiente deja al rival en jaque mate o jaque
-                boolean oponenteEsBlanco = turnoBlancas;
                 if (estaEnJaque(oponenteEsBlanco)) {
                     if (!tieneMovimientosLegales(oponenteEsBlanco)) {
                         juegoTerminado = true;
@@ -193,6 +185,8 @@ public class Juego {
                             panel.iluminarJaque(posRey[0], posRey[1]);
                         }
                         JOptionPane.showMessageDialog(panel, "¡Jaque Mate! El juego ha terminado. Ganaron las " + ganador + ".", "Fin del Juego", JOptionPane.INFORMATION_MESSAGE);
+                        piezaSeleccionada = null;
+                        return true;
                     }
                 }
             }
