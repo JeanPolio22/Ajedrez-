@@ -86,10 +86,11 @@ public class Juego {
                                 int origenF = p.getFila();
                                 int origenC = p.getColumna();
 
-                                tablero.moverPieza(origenF, origenC, fDestino, cDestino);
+                                // Usamos false para simular sin alterar haMovido
+                                tablero.moverPieza(origenF, origenC, fDestino, cDestino, false);
                                 boolean sigueEnJaque = estaEnJaque(esBlanca);
                                 
-                                tablero.moverPieza(fDestino, cDestino, origenF, origenC);
+                                tablero.moverPieza(fDestino, cDestino, origenF, origenC, false);
                                 if (piezaCapturada != null) {
                                     tablero.colocarPieza(piezaCapturada, fDestino, cDestino);
                                 }
@@ -179,9 +180,10 @@ public class Juego {
                             int origF = piezaSeleccionada.getFila();
                             int origC = piezaSeleccionada.getColumna();
 
-                            tablero.moverPieza(origF, origC, f, c);
+                            // Simulación de iluminación (false)
+                            tablero.moverPieza(origF, origC, f, c, false);
                             boolean reyExpuesto = estaEnJaque(turnoBlancas);
-                            tablero.moverPieza(f, c, origF, origC);
+                            tablero.moverPieza(f, c, origF, origC, false);
                             if (destinoTemp != null) {
                                 tablero.colocarPieza(destinoTemp, f, c);
                             }
@@ -202,17 +204,18 @@ public class Juego {
             int origF = piezaSeleccionada.getFila();
             int origC = piezaSeleccionada.getColumna();
 
-            tablero.moverPieza(origF, origC, fila, columna);
+            // Simulación de validación de movimiento (false)
+            tablero.moverPieza(origF, origC, fila, columna, false);
             boolean reyExpuesto = estaEnJaque(turnoBlancas);
-            tablero.moverPieza(fila, columna, origF, origC);
+            tablero.moverPieza(fila, columna, origF, origC, false);
             if (destinoTemp != null) {
                 tablero.colocarPieza(destinoTemp, fila, columna);
             }
 
             if (!reyExpuesto) {
+                // Movimiento REAL y definitivo (actualiza haMovido a true)
                 tablero.moverPieza(origF, origC, fila, columna);
                 
-                // Verificamos coronación de peón
                 verificarPromocion(piezaSeleccionada, fila, columna, panel);
                 
                 boolean oponenteEsBlanco = !turnoBlancas;

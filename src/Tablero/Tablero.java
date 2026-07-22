@@ -27,7 +27,13 @@ public class Tablero {
         return null;
     }
 
+    // Movimiento real del jugador (actualiza haMovido a true)
     public void moverPieza(int filaOrigen, int columnaOrigen, int filaDestino, int columnaDestino) {
+        moverPieza(filaOrigen, columnaOrigen, filaDestino, columnaDestino, true);
+    }
+
+    // Movimiento de prueba (NO altera haMovido)
+    public void moverPieza(int filaOrigen, int columnaOrigen, int filaDestino, int columnaDestino, boolean actualizarEstado) {
         if (posicionValida(filaOrigen, columnaOrigen) && posicionValida(filaDestino, columnaDestino)) {
             Pieza pieza = casillas[filaOrigen][columnaOrigen];
             casillas[filaDestino][columnaDestino] = pieza;
@@ -36,7 +42,9 @@ public class Tablero {
             if (pieza != null) {
                 pieza.setFila(filaDestino);
                 pieza.setColumna(columnaDestino);
-                pieza.setHaMovido(true); // Marca que la pieza ya se ha movido (vital para el peón)
+                if (actualizarEstado) {
+                    pieza.setHaMovido(true);
+                }
             }
         }
     }
