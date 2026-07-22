@@ -5,7 +5,10 @@ import ajedrez.Juego;
 import ajedrez.MotorRobot;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.RenderingHints;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -32,7 +35,7 @@ public class PanelTablero extends JPanel {
     private void crearTablero() {
         for (int fila = 0; fila < 8; fila++) {
             for (int columna = 0; columna < 8; columna++) {
-                JButton boton = new JButton();
+                BotonCasilla boton = new BotonCasilla();
 
                 boton.setFocusable(false);
                 boton.setFocusPainted(false);
@@ -49,7 +52,6 @@ public class PanelTablero extends JPanel {
                 final int c = columna;
 
                 boton.addActionListener(e -> {
-                    // Si estamos contra el robot y es turno de las negras, el humano no puede hacer clics
                     if (modoRobot && !juego.isTurnoBlancas()) {
                         return;
                     }
@@ -57,11 +59,10 @@ public class PanelTablero extends JPanel {
                     juego.seleccionarCasilla(f, c, this);
                     actualizarTablero();
 
-                    // Si está activo el modo robot, el turno del humano terminó (ahora le toca a las negras) y el juego sigue
                     if (modoRobot && !juego.isJuegoTerminado() && !juego.isTurnoBlancas()) {
                         MotorRobot motor = new MotorRobot(this, juego);
                         Thread hiloRobot = new Thread(motor);
-                        hiloRobot.start(); // Se inicia el hilo secundario
+                        hiloRobot.start();
                     }
                 });
 
@@ -84,7 +85,7 @@ public class PanelTablero extends JPanel {
                     if (pieza.esBlanca()) {
                         casillas[fila][columna].setForeground(Color.WHITE);
                     } else {
-                        casillas[fila][columna].setForeground(Color.BLACK);
+                        casillas[fila][columna].setForeground(new Color(20, 20, 20));
                     }
                 }
             }
@@ -131,5 +132,50 @@ public class PanelTablero extends JPanel {
 
     public JButton getCasilla(int fila, int columna) {
         return casillas[fila][columna];
+    }
+
+    // Subclase para aplicar contorno a piezas blancas (borde negro) y negras (borde blanco)
+    private class BotonCasilla extends JButton {
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+
+            String texto = getText();
+            if (texto != null && !texto.isEmpty()) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                g2.setFont(getFont());
+
+                int x = (getWidth() - g2.getFontMetrics().stringWidth(texto)) / 2;
+                int y = (getHeight() + g2.getFontMetrics().getAscent() - g2.getFontMetrics().getDescent()) / 2;
+
+                Color colorOriginal = getForeground();
+
+                if (colorOriginal.equals(Color.WHITE)) {
+                    // Contorno negro para piezas blancas
+                    g2.setColor(new Color(30, 30, 30));
+                    g2.drawString(texto, x - 1, y);
+                    g2.drawString(texto, x + 1, y);
+                    g2.drawString(texto, x, y - 1);
+                    g2.drawString(texto, x, y + 1);
+
+                    g2.setColor(Color.WHITE);
+                    g2.drawString(texto, x, y);
+                } else {
+                    // Contorno blanco para piezas negras
+                    g2.setColor(new Color(240, 240, 240));
+                    g2.drawString(texto, x - 1, y);
+                    g2.drawString(texto, x + 1, y);
+                    g2.drawString(texto, x, y - 1);
+                    g2.drawString(texto, x, y + 1);
+
+                    g2.setColor(new Color(20, 20, 20));
+                    g2.drawString(texto, x, y);
+                }
+
+                g2.dispose();
+            }
+        }
     }
 }
