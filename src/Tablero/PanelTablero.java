@@ -14,7 +14,6 @@ public class PanelTablero extends JPanel {
     private JButton[][] casillas;
     private Juego juego;
 
-    // Colores base del tablero de ajedrez
     private final Color colorClaro = new Color(240, 217, 181);
     private final Color colorOscuro = new Color(181, 136, 99);
 
@@ -37,7 +36,6 @@ public class PanelTablero extends JPanel {
                 boton.setBorder(BorderFactory.createEmptyBorder());
                 boton.setFont(new Font("Dialog", Font.PLAIN, 42));
 
-                // Asignar color inicial según la posición (patrón ajedrez)
                 if ((fila + columna) % 2 == 0) {
                     boton.setBackground(colorClaro);
                 } else {
@@ -78,19 +76,29 @@ public class PanelTablero extends JPanel {
         }
     }
 
-    // Ilumina respetando el patrón del tablero con dos tonos de verde para mantener la cuadrícula
-    public void iluminarCasilla(int fila, int columna, Color colorBase) {
+    // NUEVO: Recibe un indicador de captura (esCaptura = true pinta rojo, false pinta verde)
+    public void iluminarCasilla(int fila, int columna, boolean esCaptura) {
         Color verdeClaro = new Color(170, 215, 125);
         Color verdeOscuro = new Color(135, 185, 90);
+        
+        Color rojoClaro = new Color(235, 120, 120);
+        Color rojoOscuro = new Color(205, 90, 90);
 
-        if ((fila + columna) % 2 == 0) {
-            casillas[fila][columna].setBackground(verdeClaro);
+        if (esCaptura) {
+            if ((fila + columna) % 2 == 0) {
+                casillas[fila][columna].setBackground(rojoClaro);
+            } else {
+                casillas[fila][columna].setBackground(rojoOscuro);
+            }
         } else {
-            casillas[fila][columna].setBackground(verdeOscuro);
+            if ((fila + columna) % 2 == 0) {
+                casillas[fila][columna].setBackground(verdeClaro);
+            } else {
+                casillas[fila][columna].setBackground(verdeOscuro);
+            }
         }
     }
 
-    // Restaura el color original de todo el tablero
     public void restaurarColores() {
         for (int fila = 0; fila < 8; fila++) {
             for (int columna = 0; columna < 8; columna++) {
