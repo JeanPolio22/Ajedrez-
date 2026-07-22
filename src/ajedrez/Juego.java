@@ -106,6 +106,46 @@ public class Juego {
         return false;
     }
 
+    private void verificarPromocion(Pieza pieza, int filaDestino, int columnaDestino, PanelTablero panel) {
+        if (pieza instanceof Peon) {
+            if ((pieza.esBlanca() && filaDestino == 0) || (!pieza.esBlanca() && filaDestino == 7)) {
+                String[] opciones = {"Reina", "Torre", "Alfil", "Caballo"};
+                
+                int seleccion = JOptionPane.showOptionDialog(
+                        panel,
+                        "¡Tu peón ha llegado al final! Elige la pieza para la promoción:",
+                        "Promoción de Peón",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        opciones,
+                        opciones[0]
+                );
+
+                Pieza nuevaPieza;
+                boolean esBlanca = pieza.esBlanca();
+
+                switch (seleccion) {
+                    case 1:
+                        nuevaPieza = new Torre(esBlanca, filaDestino, columnaDestino);
+                        break;
+                    case 2:
+                        nuevaPieza = new Alfil(esBlanca, filaDestino, columnaDestino);
+                        break;
+                    case 3:
+                        nuevaPieza = new Caballo(esBlanca, filaDestino, columnaDestino);
+                        break;
+                    case 0:
+                    default:
+                        nuevaPieza = new Reina(esBlanca, filaDestino, columnaDestino);
+                        break;
+                }
+
+                tablero.colocarPieza(nuevaPieza, filaDestino, columnaDestino);
+            }
+        }
+    }
+
     public boolean seleccionarCasilla(int fila, int columna, PanelTablero panel) {
         if (juegoTerminado) return false;
 
@@ -171,6 +211,9 @@ public class Juego {
 
             if (!reyExpuesto) {
                 tablero.moverPieza(origF, origC, fila, columna);
+                
+                // Verificamos coronación de peón
+                verificarPromocion(piezaSeleccionada, fila, columna, panel);
                 
                 boolean oponenteEsBlanco = !turnoBlancas;
                 turnoBlancas = !turnoBlancas;
