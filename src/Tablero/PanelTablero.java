@@ -47,8 +47,9 @@ public class PanelTablero extends JPanel {
                 final int f = fila;
                 final int c = columna;
 
+                // Dentro de tu crearTablero() en PanelTablero.java:
                 boton.addActionListener(e -> {
-                    juego.seleccionarCasilla(f, c);
+                    juego.seleccionarCasilla(f, c, this); // <--- Le pasamos 'this' (el panel actual)
                     actualizarTablero();
                 });
 
