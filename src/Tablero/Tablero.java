@@ -4,68 +4,88 @@ import Piezas.Pieza;
 
 public class Tablero {
 
-    // Matriz que almacenará las piezas del juego.
-    private Pieza[][] tablero;
+    private Pieza[][] casillas;
 
-    // Constructor.
     public Tablero() {
-        tablero = new Pieza[8][8];
+        casillas = new Pieza[8][8];
     }
 
-    // Devuelve la pieza que se encuentra en una posición.
-    public Pieza getPieza(int fila, int columna) {
-        return tablero[fila][columna];
-    }
-
-    // Coloca una pieza en el tablero.
     public void colocarPieza(Pieza pieza, int fila, int columna) {
-        tablero[fila][columna] = pieza;
-    }
-
-    // Elimina una pieza del tablero.
-    public void eliminarPieza(int fila, int columna) {
-        tablero[fila][columna] = null;
-    }
-
-    // Permite mover una pieza dentro del tablero.
-    public void moverPieza(int filaOrigen,
-                           int columnaOrigen,
-                           int filaDestino,
-                           int columnaDestino) {
-
-        Pieza pieza = tablero[filaOrigen][columnaOrigen];
-
-        tablero[filaDestino][columnaDestino] = pieza;
-        tablero[filaOrigen][columnaOrigen] = null;
-
-        // Actualizamos la nueva posición de la pieza y registramos su movimiento.
-        if (pieza != null) {
-            pieza.setFila(filaDestino);
-            pieza.setColumna(columnaDestino);
-            pieza.setHaMovido(true); // NUEVO: Registra que la pieza ya realizó un movimiento
+        if (posicionValida(fila, columna)) {
+            casillas[fila][columna] = pieza;
+            if (pieza != null) {
+                pieza.setFila(fila);
+                pieza.setColumna(columna);
+            }
         }
     }
 
-    // Verifica si una casilla está vacía.
-    public boolean estaVacia(int fila, int columna) {
-        return tablero[fila][columna] == null;
+    public Pieza getPieza(int fila, int columna) {
+        if (posicionValida(fila, columna)) {
+            return casillas[fila][columna];
+        }
+        return null;
     }
-    
-    // Verifica si una posición pertenece al tablero.
+
+    public void moverPieza(int filaOrigen, int columnaOrigen, int filaDestino, int columnaDestino) {
+        if (posicionValida(filaOrigen, columnaOrigen) && posicionValida(filaDestino, columnaDestino)) {
+            Pieza pieza = casillas[filaOrigen][columnaOrigen];
+            casillas[filaDestino][columnaDestino] = pieza;
+            casillas[filaOrigen][columnaOrigen] = null;
+
+            if (pieza != null) {
+                pieza.setFila(filaDestino);
+                pieza.setColumna(columnaDestino);
+            }
+        }
+    }
+
     public boolean posicionValida(int fila, int columna) {
-        return fila >= 0 && fila < 8 &&
-               columna >= 0 && columna < 8;
+        return fila >= 0 && fila < 8 && columna >= 0 && columna < 8;
     }
 
-    // Devuelve true si en esa casilla hay una pieza enemiga.
-    public boolean hayEnemigo(int fila,
-                              int columna,
-                              boolean blanca) {
+    public boolean estaVacia(int fila, int columna) {
+        return getPieza(fila, columna) == null;
+    }
 
-        if (estaVacia(fila, columna)) {
+    public boolean hayEnemigo(int fila, int columna, boolean esBlanca) {
+        Pieza pieza = getPieza(fila, columna);
+        if (pieza == null) {
             return false;
         }
+        return pieza.esBlanca() != esBlanca;
+    }
 
-        return tablero[fila][columna].esBlanca() != blanca;
+    // ==========================================
+    // NUEVOS MÉTODOS PARA DETECTAR JAQUE
+    // ==========================================
+
+    // Devuelve las coordenadas [fila, columna] del Rey del color indicado
+    public int[] buscarRey(boolean esBlanca) {
+        for (int f = 0; f < 8; f++) {
+            for (int c = 0; c < 8; c++) {
+                Pieza p = getPieza(f, c);
+                if (p != null && p instanceof Piezas.Rey && p.esBlanca() == esBlanca) {
+                    return new int[]{f, c};
+                }
+            }
+        }
+        return null;
+    }
+
+    // Verifica si una casilla específica está siendo atacada por el bando contrario
+    public boolean esCasillaAtacada(int fila, int columna, boolean atacanteEsBlanco) {
+        for (int f = 0; f < 8; f++) {
+            for (int c = 0; c < 8; c++) {
+                Pieza p = getPieza(f, c);
+                if (p != null && p.esBlanca() == atacanteEsBlanco) {
+                    // Comprobamos si esta pieza enemiga puede atacar la casilla objetivo
+                    if (p.movimientoValido(fila, columna, this)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
