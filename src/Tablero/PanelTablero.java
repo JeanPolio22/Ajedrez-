@@ -47,9 +47,8 @@ public class PanelTablero extends JPanel {
                 final int f = fila;
                 final int c = columna;
 
-                // Dentro de tu crearTablero() en PanelTablero.java:
                 boton.addActionListener(e -> {
-                    juego.seleccionarCasilla(f, c, this); // <--- Le pasamos 'this' (el panel actual)
+                    juego.seleccionarCasilla(f, c, this);
                     actualizarTablero();
                 });
 
@@ -79,12 +78,19 @@ public class PanelTablero extends JPanel {
         }
     }
 
-    // NUEVO: Permite cambiar el color de fondo de una casilla específica (para alumbrar movimientos)
-    public void iluminarCasilla(int fila, int columna, Color color) {
-        casillas[fila][columna].setBackground(color);
+    // Ilumina respetando el patrón del tablero con dos tonos de verde para mantener la cuadrícula
+    public void iluminarCasilla(int fila, int columna, Color colorBase) {
+        Color verdeClaro = new Color(170, 215, 125);
+        Color verdeOscuro = new Color(135, 185, 90);
+
+        if ((fila + columna) % 2 == 0) {
+            casillas[fila][columna].setBackground(verdeClaro);
+        } else {
+            casillas[fila][columna].setBackground(verdeOscuro);
+        }
     }
 
-    // NUEVO: Restaura el color original de todo el tablero (elimina las iluminaciones)
+    // Restaura el color original de todo el tablero
     public void restaurarColores() {
         for (int fila = 0; fila < 8; fila++) {
             for (int columna = 0; columna < 8; columna++) {
