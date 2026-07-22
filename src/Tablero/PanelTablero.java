@@ -2,6 +2,7 @@ package Tablero;
 
 import Piezas.Pieza;
 import ajedrez.Juego;
+import ajedrez.MotorRobot;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -13,11 +14,13 @@ public class PanelTablero extends JPanel {
 
     private JButton[][] casillas;
     private Juego juego;
+    private boolean modoRobot;
 
     private final Color colorClaro = new Color(240, 217, 181);
     private final Color colorOscuro = new Color(181, 136, 99);
 
-    public PanelTablero() {
+    public PanelTablero(boolean modoRobot) {
+        this.modoRobot = modoRobot;
         setLayout(new GridLayout(8, 8));
         casillas = new JButton[8][8];
         juego = new Juego();
@@ -46,8 +49,20 @@ public class PanelTablero extends JPanel {
                 final int c = columna;
 
                 boton.addActionListener(e -> {
+                    // Si estamos contra el robot y es turno de las negras, el humano no puede hacer clics
+                    if (modoRobot && !juego.isTurnoBlancas()) {
+                        return;
+                    }
+
                     juego.seleccionarCasilla(f, c, this);
                     actualizarTablero();
+
+                    // Si está activo el modo robot, el turno del humano terminó (ahora le toca a las negras) y el juego sigue
+                    if (modoRobot && !juego.isJuegoTerminado() && !juego.isTurnoBlancas()) {
+                        MotorRobot motor = new MotorRobot(this, juego);
+                        Thread hiloRobot = new Thread(motor);
+                        hiloRobot.start(); // Se inicia el hilo secundario
+                    }
                 });
 
                 casillas[fila][columna] = boton;
@@ -98,9 +113,8 @@ public class PanelTablero extends JPanel {
         }
     }
 
-    // NUEVO: Pinta la casilla del rey en jaque con un rojo de alerta único
     public void iluminarJaque(int fila, int columna) {
-        casillas[fila][columna].setBackground(new Color(255, 69, 0)); // Rojo anaranjado intenso
+        casillas[fila][columna].setBackground(new Color(255, 69, 0));
     }
 
     public void restaurarColores() {

@@ -5,18 +5,15 @@ import javax.swing.JFrame;
 
 public class Ventana extends JFrame {
 
-    public Ventana() {
-
+    public Ventana(boolean modoRobot) {
         setTitle("Ajedrez");
-        setSize(700,700);
+        setSize(700, 700);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
 
-        add(new PanelTablero());
+        add(new PanelTablero(modoRobot));
 
         setVisible(true);
-
     }
-
 }

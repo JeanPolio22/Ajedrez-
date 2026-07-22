@@ -36,6 +36,14 @@ public class Juego {
         this.panelTablero = panelTablero;
     }
 
+    public boolean isTurnoBlancas() {
+        return turnoBlancas;
+    }
+
+    public boolean isJuegoTerminado() {
+        return juegoTerminado;
+    }
+
     private void colocarPiezas() {
         tablero.colocarPieza(new Torre(false, 0, 0), 0, 0);
         tablero.colocarPieza(new Caballo(false, 0, 1), 0, 1);
@@ -86,7 +94,6 @@ public class Juego {
                                 int origenF = p.getFila();
                                 int origenC = p.getColumna();
 
-                                // Usamos false para simular sin alterar haMovido
                                 tablero.moverPieza(origenF, origenC, fDestino, cDestino, false);
                                 boolean sigueEnJaque = estaEnJaque(esBlanca);
                                 
@@ -110,39 +117,114 @@ public class Juego {
     private void verificarPromocion(Pieza pieza, int filaDestino, int columnaDestino, PanelTablero panel) {
         if (pieza instanceof Peon) {
             if ((pieza.esBlanca() && filaDestino == 0) || (!pieza.esBlanca() && filaDestino == 7)) {
-                String[] opciones = {"Reina", "Torre", "Alfil", "Caballo"};
-                
-                int seleccion = JOptionPane.showOptionDialog(
-                        panel,
-                        "¡Tu peón ha llegado al final! Elige la pieza para la promoción:",
-                        "Promoción de Peón",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        opciones,
-                        opciones[0]
-                );
-
-                Pieza nuevaPieza;
                 boolean esBlanca = pieza.esBlanca();
+                Pieza nuevaPieza;
 
-                switch (seleccion) {
-                    case 1:
-                        nuevaPieza = new Torre(esBlanca, filaDestino, columnaDestino);
-                        break;
-                    case 2:
-                        nuevaPieza = new Alfil(esBlanca, filaDestino, columnaDestino);
-                        break;
-                    case 3:
-                        nuevaPieza = new Caballo(esBlanca, filaDestino, columnaDestino);
-                        break;
-                    case 0:
-                    default:
-                        nuevaPieza = new Reina(esBlanca, filaDestino, columnaDestino);
-                        break;
+                // Si es el robot (negras), corona automáticamente a Reina
+                if (!esBlanca) {
+                    nuevaPieza = new Reina(esBlanca, filaDestino, columnaDestino);
+                } else {
+                    // Si es el jugador humano, despliega el diálogo de selección
+                    String[] opciones = {"Reina", "Torre", "Alfil", "Caballo"};
+                    
+                    int seleccion = JOptionPane.showOptionDialog(
+                            panel,
+                            "¡Tu peón ha llegado al final! Elige la pieza para la promoción:",
+                            "Promoción de Peón",
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,
+                            opciones,
+                            opciones[0]
+                    );
+
+                    switch (seleccion) {
+                        case 1:
+                            nuevaPieza = new Torre(esBlanca, filaDestino, columnaDestino);
+                            break;
+                        case 2:
+                            nuevaPieza = new Alfil(esBlanca, filaDestino, columnaDestino);
+                            break;
+                        case 3:
+                            nuevaPieza = new Caballo(esBlanca, filaDestino, columnaDestino);
+                            break;
+                        case 0:
+                        default:
+                            nuevaPieza = new Reina(esBlanca, filaDestino, columnaDestino);
+                            break;
+                    }
                 }
 
                 tablero.colocarPieza(nuevaPieza, filaDestino, columnaDestino);
+            }
+        }
+    }
+
+    public void ejecutarTurnoRobot(PanelTablero panel) {
+        if (juegoTerminado || turnoBlancas) return;
+
+        int mejorValorPuntuacion = -9999;
+        int[] mejorMovimiento = null; 
+        Pieza piezaMovidaSeleccionada = null;
+
+        for (int f = 0; f < 8; f++) {
+            for (int c = 0; c < 8; c++) {
+                Pieza p = tablero.getPieza(f, c);
+                if (p != null && !p.esBlanca()) { // Piezas del robot
+                    for (int fd = 0; fd < 8; fd++) {
+                        for (int cd = 0; cd < 8; cd++) {
+                            if (p.movimientoValido(fd, cd, tablero)) {
+                                
+                                Pieza destinoTemp = tablero.getPieza(fd, cd);
+                                int origF = p.getFila();
+                                int origC = p.getColumna();
+
+                                tablero.moverPieza(origF, origC, fd, cd, false);
+                                boolean reyExpuesto = estaEnJaque(false);
+                                tablero.moverPieza(fd, cd, origF, origC, false);
+                                if (destinoTemp != null) {
+                                    tablero.colocarPieza(destinoTemp, fd, cd);
+                                }
+
+                                if (!reyExpuesto) {
+                                    int puntuacionMovimiento = 0;
+
+                                    // Prioridad 1: Capturar piezas enemigas
+                                    if (destinoTemp != null) {
+                                        puntuacionMovimiento += 10; 
+                                    }
+
+                                    // Prioridad 2: Avanzar hacia adelante
+                                    puntuacionMovimiento += fd; 
+
+                                    if (puntuacionMovimiento > mejorValorPuntuacion) {
+                                        mejorValorPuntuacion = puntuacionMovimiento;
+                                        mejorMovimiento = new int[]{origF, origC, fd, cd};
+                                        piezaMovidaSeleccionada = p;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (mejorMovimiento != null) {
+            int origF = mejorMovimiento[0];
+            int origC = mejorMovimiento[1];
+            int fd = mejorMovimiento[2];
+            int cd = mejorMovimiento[3];
+
+            tablero.moverPieza(origF, origC, fd, cd);
+            verificarPromocion(piezaMovidaSeleccionada, fd, cd, panel);
+            turnoBlancas = true;
+
+            if (estaEnJaque(true)) {
+                if (!tieneMovimientosLegales(true)) {
+                    juegoTerminado = true;
+                    JOptionPane.showMessageDialog(panel, "¡Jaque Mate! El robot ha ganado.", "Fin del Juego", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         }
     }
@@ -180,7 +262,6 @@ public class Juego {
                             int origF = piezaSeleccionada.getFila();
                             int origC = piezaSeleccionada.getColumna();
 
-                            // Simulación de iluminación (false)
                             tablero.moverPieza(origF, origC, f, c, false);
                             boolean reyExpuesto = estaEnJaque(turnoBlancas);
                             tablero.moverPieza(f, c, origF, origC, false);
@@ -204,7 +285,6 @@ public class Juego {
             int origF = piezaSeleccionada.getFila();
             int origC = piezaSeleccionada.getColumna();
 
-            // Simulación de validación de movimiento (false)
             tablero.moverPieza(origF, origC, fila, columna, false);
             boolean reyExpuesto = estaEnJaque(turnoBlancas);
             tablero.moverPieza(fila, columna, origF, origC, false);
@@ -213,9 +293,7 @@ public class Juego {
             }
 
             if (!reyExpuesto) {
-                // Movimiento REAL y definitivo (actualiza haMovido a true)
                 tablero.moverPieza(origF, origC, fila, columna);
-                
                 verificarPromocion(piezaSeleccionada, fila, columna, panel);
                 
                 boolean oponenteEsBlanco = !turnoBlancas;
