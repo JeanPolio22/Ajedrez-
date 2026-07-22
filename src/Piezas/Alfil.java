@@ -10,7 +10,7 @@ public class Alfil extends Pieza {
 
     @Override
     public String getSimbolo() {
-        return "♝"; // Símbolo de alfil
+        return "♝";
     }
 
     @Override
@@ -25,19 +25,22 @@ public class Alfil extends Pieza {
         int difFila = Math.abs(filaDestino - filaOrigen);
         int difColumna = Math.abs(columnaDestino - columnaOrigen);
 
-        // El alfil se mueve en diagonal (ancho y alto iguales)
+        // El alfil se mueve en diagonal
         if (difFila != difColumna) {
             return false;
         }
 
-        // Validar que el camino esté despejado
         int pasoFila = (filaDestino > filaOrigen) ? 1 : -1;
         int pasoColumna = (columnaDestino > columnaOrigen) ? 1 : -1;
 
         int f = filaOrigen + pasoFila;
         int c = columnaOrigen + pasoColumna;
 
+        // Validamos el camino intermedio asegurando que las coordenadas estén dentro del tablero
         while (f != filaDestino && c != columnaDestino) {
+            if (!tablero.posicionValida(f, c)) {
+                return false;
+            }
             if (!tablero.estaVacia(f, c)) {
                 return false; // Hay una pieza bloqueando el paso
             }
