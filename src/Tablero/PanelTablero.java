@@ -76,7 +76,6 @@ public class PanelTablero extends JPanel {
         }
     }
 
-    // NUEVO: Recibe un indicador de captura (esCaptura = true pinta rojo, false pinta verde)
     public void iluminarCasilla(int fila, int columna, boolean esCaptura) {
         Color verdeClaro = new Color(170, 215, 125);
         Color verdeOscuro = new Color(135, 185, 90);
@@ -97,6 +96,11 @@ public class PanelTablero extends JPanel {
                 casillas[fila][columna].setBackground(verdeOscuro);
             }
         }
+    }
+
+    // NUEVO: Pinta la casilla del rey en jaque con un rojo de alerta único
+    public void iluminarJaque(int fila, int columna) {
+        casillas[fila][columna].setBackground(new Color(255, 69, 0)); // Rojo anaranjado intenso
     }
 
     public void restaurarColores() {
