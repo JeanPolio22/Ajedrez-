@@ -36,6 +36,7 @@ public class Tablero {
             if (pieza != null) {
                 pieza.setFila(filaDestino);
                 pieza.setColumna(columnaDestino);
+                pieza.setHaMovido(true); // Marca que la pieza ya se ha movido (vital para el peón)
             }
         }
     }
@@ -56,11 +57,6 @@ public class Tablero {
         return pieza.esBlanca() != esBlanca;
     }
 
-    // ==========================================
-    // NUEVOS MÉTODOS PARA DETECTAR JAQUE
-    // ==========================================
-
-    // Devuelve las coordenadas [fila, columna] del Rey del color indicado
     public int[] buscarRey(boolean esBlanca) {
         for (int f = 0; f < 8; f++) {
             for (int c = 0; c < 8; c++) {
@@ -73,13 +69,11 @@ public class Tablero {
         return null;
     }
 
-    // Verifica si una casilla específica está siendo atacada por el bando contrario
     public boolean esCasillaAtacada(int fila, int columna, boolean atacanteEsBlanco) {
         for (int f = 0; f < 8; f++) {
             for (int c = 0; c < 8; c++) {
                 Pieza p = getPieza(f, c);
                 if (p != null && p.esBlanca() == atacanteEsBlanco) {
-                    // Comprobamos si esta pieza enemiga puede atacar la casilla objetivo
                     if (p.movimientoValido(fila, columna, this)) {
                         return true;
                     }
