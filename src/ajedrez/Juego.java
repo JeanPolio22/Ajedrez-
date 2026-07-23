@@ -9,7 +9,10 @@ import Piezas.Rey;
 import Piezas.Torre;
 import Tablero.PanelTablero;
 import Tablero.Tablero;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
+import marco.Ventana;
 
 public class Juego {
 
@@ -19,11 +22,18 @@ public class Juego {
     private PanelTablero panelTablero;
     private boolean juegoTerminado;
 
+    // Listas para almacenar las piezas capturadas
+    private List<Pieza> capturadasPorBlancas;
+    private List<Pieza> capturadasPorNegras;
+    private Ventana ventanaPrincipal;
+
     public Juego() {
         tablero = new Tablero();
         turnoBlancas = true;
         piezaSeleccionada = null;
         juegoTerminado = false;
+        capturadasPorBlancas = new ArrayList<>();
+        capturadasPorNegras = new ArrayList<>();
         colocarPiezas();
     }
 
@@ -34,6 +44,10 @@ public class Juego {
 
     public void setPanelTablero(PanelTablero panelTablero) {
         this.panelTablero = panelTablero;
+    }
+
+    public void setVentanaPrincipal(Ventana ventana) {
+        this.ventanaPrincipal = ventana;
     }
 
     public boolean isTurnoBlancas() {
@@ -82,7 +96,6 @@ public class Juego {
         return tablero.esCasillaAtacada(posRey[0], posRey[1], !esBlanca);
     }
 
-    // Regla de empate por material insuficiente (Rey vs Rey)
     public boolean esMaterialInsuficiente() {
         int contadorPiezas = 0;
         boolean hayOtrasPiezas = false;
@@ -132,6 +145,19 @@ public class Juego {
             }
         }
         return false;
+    }
+
+    private void registrarCaptura(Pieza piezaCapturada, boolean capturoBlanca) {
+        if (piezaCapturada != null) {
+            if (capturoBlanca) {
+                capturadasPorBlancas.add(piezaCapturada);
+            } else {
+                capturadasPorNegras.add(piezaCapturada);
+            }
+            if (ventanaPrincipal != null) {
+                ventanaPrincipal.actualizarPanelesCapturadas(capturadasPorBlancas, capturadasPorNegras);
+            }
+        }
     }
 
     private void verificarPromocion(Pieza pieza, int filaDestino, int columnaDestino, PanelTablero panel) {
@@ -232,20 +258,32 @@ public class Juego {
             int fd = mejorMovimiento[2];
             int cd = mejorMovimiento[3];
 
+            Pieza piezaCapturada = tablero.getPieza(fd, cd);
             tablero.moverPieza(origF, origC, fd, cd);
+            
+            registrarCaptura(piezaCapturada, false); 
             verificarPromocion(piezaMovidaSeleccionada, fd, cd, panel);
             
             if (esMaterialInsuficiente()) {
                 juegoTerminado = true;
+                if (ventanaPrincipal != null) {
+                    ventanaPrincipal.detenerTodosLosRelojes();
+                }
                 JOptionPane.showMessageDialog(panel, "¡Empate por material insuficiente (Rey vs Rey)!", "Fin del Juego", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
 
             turnoBlancas = true;
+            if (ventanaPrincipal != null) {
+                ventanaPrincipal.cambiarTurnoRelojes(turnoBlancas);
+            }
 
             if (estaEnJaque(true)) {
                 if (!tieneMovimientosLegales(true)) {
                     juegoTerminado = true;
+                    if (ventanaPrincipal != null) {
+                        ventanaPrincipal.detenerTodosLosRelojes();
+                    }
                     JOptionPane.showMessageDialog(panel, "¡Jaque Mate! El robot ha ganado.", "Fin del Juego", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
@@ -316,11 +354,19 @@ public class Juego {
             }
 
             if (!reyExpuesto) {
+                Pieza piezaCapturada = tablero.getPieza(fila, columna);
+                boolean turnoActualBlanco = turnoBlancas;
+
                 tablero.moverPieza(origF, origC, fila, columna);
+                
+                registrarCaptura(piezaCapturada, turnoActualBlanco);
                 verificarPromocion(piezaSeleccionada, fila, columna, panel);
                 
                 if (esMaterialInsuficiente()) {
                     juegoTerminado = true;
+                    if (ventanaPrincipal != null) {
+                        ventanaPrincipal.detenerTodosLosRelojes();
+                    }
                     panel.restaurarColores();
                     JOptionPane.showMessageDialog(panel, "¡Empate por material insuficiente (Rey vs Rey)!", "Fin del Juego", JOptionPane.INFORMATION_MESSAGE);
                     piezaSeleccionada = null;
@@ -330,9 +376,17 @@ public class Juego {
                 boolean oponenteEsBlanco = !turnoBlancas;
                 turnoBlancas = !turnoBlancas;
 
+                // Cambiamos el turno del reloj de ajedrez
+                if (ventanaPrincipal != null) {
+                    ventanaPrincipal.cambiarTurnoRelojes(turnoBlancas);
+                }
+
                 if (estaEnJaque(oponenteEsBlanco)) {
                     if (!tieneMovimientosLegales(oponenteEsBlanco)) {
                         juegoTerminado = true;
+                        if (ventanaPrincipal != null) {
+                            ventanaPrincipal.detenerTodosLosRelojes();
+                        }
                         String ganador = oponenteEsBlanco ? "Negras" : "Blancas";
                         panel.restaurarColores();
                         int[] posRey = tablero.buscarRey(oponenteEsBlanco);

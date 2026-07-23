@@ -145,6 +145,7 @@ public class PanelTablero extends JPanel {
         return casillas[fila][columna];
     }
 
+
     // Subclase para aplicar contorno estético a piezas blancas (borde negro) y negras (borde blanco)
     private class BotonCasilla extends JButton {
 
@@ -188,5 +189,8 @@ public class PanelTablero extends JPanel {
                 g2.dispose();
             }
         }
+    }
+    public Juego getJuego() {
+        return juego;
     }
 }
