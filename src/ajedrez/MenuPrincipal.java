@@ -1,84 +1,100 @@
 package ajedrez;
 
-import Tablero.PanelTablero;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import marco.Ventana;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 
-public class MenuPrincipal extends JFrame implements ActionListener {
-
-    private JButton btnHumanoHumano;
-    private JButton btnRobotHumano;
-    private JLabel lblTitulo;
-    private JLabel lblSubtitulo;
+public class MenuPrincipal extends JFrame {
 
     public MenuPrincipal() {
         setTitle("Ajedrez - Menú Principal");
-        setSize(400, 250);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(450, 350);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout(10, 10));
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
 
-        // Panel superior para los textos
-        JPanel panelNorte = new JPanel(new GridLayout(2, 1, 5, 5));
-        panelNorte.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
-        
-        lblTitulo = new JLabel("Bienvenido al Ajedrez", JLabel.CENTER);
-        lblTitulo.setFont(new Font("Arial", Font.BOLD, 20));
-        
-        lblSubtitulo = new JLabel("Por favor seleccione su modo de juego:", JLabel.CENTER);
-        lblSubtitulo.setFont(new Font("Arial", Font.PLAIN, 14));
+        // Asignamos un icono de ajedrez generado por código para la ventana
+        setIconImage(crearIconoAjedrez());
 
-        panelNorte.add(lblTitulo);
-        panelNorte.add(lblSubtitulo);
-        add(panelNorte, BorderLayout.NORTH);
+        // Panel principal con diseño moderno y un fondo elegante
+        JPanel panelPrincipal = new JPanel();
+        panelPrincipal.setLayout(null);
+        panelPrincipal.setBackground(new Color(245, 247, 250));
+        add(panelPrincipal);
 
-        // Panel central para los botones de selección
-        JPanel panelCentro = new JPanel(new GridLayout(2, 1, 10, 10));
-        panelCentro.setBorder(BorderFactory.createEmptyBorder(10, 50, 20, 50));
+        // Título principal con mejor tipografía y color
+        JLabel lblTitulo = new JLabel("Bienvenido al Ajedrez", SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 26));
+        lblTitulo.setForeground(new Color(40, 44, 52));
+        lblTitulo.setBounds(40, 30, 370, 40);
+        panelPrincipal.add(lblTitulo);
 
-        btnHumanoHumano = new JButton("Humano vs Humano");
-        btnRobotHumano = new JButton("Robot vs Humano");
+        // Subtítulo descriptivo
+        JLabel lblSubtitulo = new JLabel("Por favor, seleccione su modo de juego:", SwingConstants.CENTER);
+        lblSubtitulo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblSubtitulo.setForeground(new Color(100, 110, 120));
+        lblSubtitulo.setBounds(40, 80, 370, 25);
+        panelPrincipal.add(lblSubtitulo);
 
-        btnHumanoHumano.setFont(new Font("Arial", Font.PLAIN, 14));
-        btnRobotHumano.setFont(new Font("Arial", Font.PLAIN, 14));
-
-        btnHumanoHumano.addActionListener(this);
-        btnRobotHumano.addActionListener(this);
-
-        panelCentro.add(btnHumanoHumano);
-        panelCentro.add(btnRobotHumano);
-        add(panelCentro, BorderLayout.CENTER);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == btnHumanoHumano) {
-            iniciarPartida(false); // Modo normal
-        } else if (e.getSource() == btnRobotHumano) {
-            iniciarPartida(true);  // Modo con Robot
-        }
-    }
-
-    private void iniciarPartida(boolean modoRobot) {
-        this.dispose(); // Cierra el menú principal
-
-        // Ventana del tablero de ajedrez
-        JFrame ventanaJuego = new JFrame("Ajedrez");
-        ventanaJuego.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        PanelTablero panelTablero = new PanelTablero(modoRobot); // Le pasamos si juega contra el robot
-        ventanaJuego.add(panelTablero);
-        
-        ventanaJuego.pack();
-        ventanaJuego.setLocationRelativeTo(null);
-        ventanaJuego.setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new MenuPrincipal().setVisible(true);
+        // Botón 1: Humano vs Humano
+        JButton btnHumano = new JButton("Humano vs Humano");
+        estilizarBoton(btnHumano, new Color(52, 152, 219));
+        btnHumano.setBounds(75, 135, 285, 48);
+        btnHumano.addActionListener(e -> {
+            Ventana ventana = new Ventana(false);
+            ventana.setVisible(true);
+            dispose(); // Cierra el menú principal
         });
+        panelPrincipal.add(btnHumano);
+
+        // Botón 2: Robot vs Humano
+        JButton btnRobot = new JButton("Robot vs Humano");
+        estilizarBoton(btnRobot, new Color(46, 204, 113));
+        btnRobot.setBounds(75, 200, 285, 48);
+        btnRobot.addActionListener(e -> {
+            Ventana ventana = new Ventana(true);
+            ventana.setVisible(true);
+            dispose(); // Cierra el menú principal
+        });
+        panelPrincipal.add(btnRobot);
+    }
+
+    // Método para aplicar estilos modernos a los botones
+    private void estilizarBoton(JButton boton, Color colorFondo) {
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        boton.setForeground(Color.WHITE);
+        boton.setBackground(colorFondo);
+        boton.setFocusPainted(false);
+        boton.setBorder(new EmptyBorder(10, 10, 10, 10));
+        boton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+    }
+
+    // Método que dibuja un icono de una torre de ajedrez para usarlo en la ventana
+    private java.awt.Image crearIconoAjedrez() {
+        BufferedImage imagen = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = imagen.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        // Fondo circular azulado para el icono
+        g2.setColor(new Color(41, 128, 185));
+        g2.fillOval(2, 2, 28, 28);
+
+        // Dibujamos una torre en blanco dentro del icono
+        g2.setColor(Color.WHITE);
+        g2.fillRect(9, 13, 14, 14); // Cuerpo de la torre
+        g2.fillRect(8, 10, 16, 4);  // Almenas superiores
+        g2.fillRect(8, 27, 16, 3);  // Base
+        
+        g2.dispose();
+        return imagen;
     }
 }
