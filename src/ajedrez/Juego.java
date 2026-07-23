@@ -82,6 +82,26 @@ public class Juego {
         return tablero.esCasillaAtacada(posRey[0], posRey[1], !esBlanca);
     }
 
+    // Regla de empate por material insuficiente (Rey vs Rey)
+    public boolean esMaterialInsuficiente() {
+        int contadorPiezas = 0;
+        boolean hayOtrasPiezas = false;
+
+        for (int f = 0; f < 8; f++) {
+            for (int c = 0; c < 8; c++) {
+                Pieza p = tablero.getPieza(f, c);
+                if (p != null) {
+                    contadorPiezas++;
+                    if (!(p instanceof Rey)) {
+                        hayOtrasPiezas = true;
+                    }
+                }
+            }
+        }
+
+        return (contadorPiezas == 2 && !hayOtrasPiezas);
+    }
+
     public boolean tieneMovimientosLegales(boolean esBlanca) {
         for (int fOrigen = 0; fOrigen < 8; fOrigen++) {
             for (int cOrigen = 0; cOrigen < 8; cOrigen++) {
@@ -120,11 +140,9 @@ public class Juego {
                 boolean esBlanca = pieza.esBlanca();
                 Pieza nuevaPieza;
 
-                // Si es el robot (negras), corona automáticamente a Reina
                 if (!esBlanca) {
                     nuevaPieza = new Reina(esBlanca, filaDestino, columnaDestino);
                 } else {
-                    // Si es el jugador humano, despliega el diálogo de selección
                     String[] opciones = {"Reina", "Torre", "Alfil", "Caballo"};
                     
                     int seleccion = JOptionPane.showOptionDialog(
@@ -170,7 +188,7 @@ public class Juego {
         for (int f = 0; f < 8; f++) {
             for (int c = 0; c < 8; c++) {
                 Pieza p = tablero.getPieza(f, c);
-                if (p != null && !p.esBlanca()) { // Piezas del robot
+                if (p != null && !p.esBlanca()) {
                     for (int fd = 0; fd < 8; fd++) {
                         for (int cd = 0; cd < 8; cd++) {
                             if (p.movimientoValido(fd, cd, tablero)) {
@@ -189,12 +207,10 @@ public class Juego {
                                 if (!reyExpuesto) {
                                     int puntuacionMovimiento = 0;
 
-                                    // Prioridad 1: Capturar piezas enemigas
                                     if (destinoTemp != null) {
                                         puntuacionMovimiento += 10; 
                                     }
 
-                                    // Prioridad 2: Avanzar hacia adelante
                                     puntuacionMovimiento += fd; 
 
                                     if (puntuacionMovimiento > mejorValorPuntuacion) {
@@ -218,6 +234,13 @@ public class Juego {
 
             tablero.moverPieza(origF, origC, fd, cd);
             verificarPromocion(piezaMovidaSeleccionada, fd, cd, panel);
+            
+            if (esMaterialInsuficiente()) {
+                juegoTerminado = true;
+                JOptionPane.showMessageDialog(panel, "¡Empate por material insuficiente (Rey vs Rey)!", "Fin del Juego", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
             turnoBlancas = true;
 
             if (estaEnJaque(true)) {
@@ -296,6 +319,14 @@ public class Juego {
                 tablero.moverPieza(origF, origC, fila, columna);
                 verificarPromocion(piezaSeleccionada, fila, columna, panel);
                 
+                if (esMaterialInsuficiente()) {
+                    juegoTerminado = true;
+                    panel.restaurarColores();
+                    JOptionPane.showMessageDialog(panel, "¡Empate por material insuficiente (Rey vs Rey)!", "Fin del Juego", JOptionPane.INFORMATION_MESSAGE);
+                    piezaSeleccionada = null;
+                    return true;
+                }
+
                 boolean oponenteEsBlanco = !turnoBlancas;
                 turnoBlancas = !turnoBlancas;
 
