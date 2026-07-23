@@ -52,6 +52,7 @@ public class PanelTablero extends JPanel {
                 final int c = columna;
 
                 boton.addActionListener(e -> {
+                    // Si estamos contra el robot y es turno de las negras, el humano no puede hacer clics
                     if (modoRobot && !juego.isTurnoBlancas()) {
                         return;
                     }
@@ -59,7 +60,17 @@ public class PanelTablero extends JPanel {
                     juego.seleccionarCasilla(f, c, this);
                     actualizarTablero();
 
+                    // Si está activo el modo robot, el turno del humano terminó y el juego sigue
                     if (modoRobot && !juego.isJuegoTerminado() && !juego.isTurnoBlancas()) {
+                        // Limpiamos los colores y luces de selecciones previas antes de que piense el robot
+                        restaurarColores();
+                        if (juego.estaEnJaque(true)) {
+                            int[] posRey = juego.getTablero().buscarRey(true);
+                            if (posRey != null) {
+                                iluminarJaque(posRey[0], posRey[1]);
+                            }
+                        }
+
                         MotorRobot motor = new MotorRobot(this, juego);
                         Thread hiloRobot = new Thread(motor);
                         hiloRobot.start();
@@ -134,7 +145,7 @@ public class PanelTablero extends JPanel {
         return casillas[fila][columna];
     }
 
-    // Subclase para aplicar contorno a piezas blancas (borde negro) y negras (borde blanco)
+    // Subclase para aplicar contorno estético a piezas blancas (borde negro) y negras (borde blanco)
     private class BotonCasilla extends JButton {
 
         @Override
